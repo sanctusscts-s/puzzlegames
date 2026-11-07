@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Puzzle Grind</title>
+<style>
+:root{color-scheme:dark;--bg:#030712;--card:#0f172a;--cell:#16213a;--blk:#0a1020;--b:#38bdf8;--r:#fb7185;--g:#34d399;--t:#e2e8f0;--m:#94a3b8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:14px 10px 40px}
+h1{margin:6px 0 10px;font-size:1.5rem;color:var(--b)}
+.bar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+button{font:inherit;color:var(--t);background:var(--card);border:1px solid #243049;border-radius:8px;padding:7px 11px;cursor:pointer}
+button.on{border-color:var(--b);color:var(--b)}
+#info{display:flex;gap:16px;color:var(--m);font-size:.9rem;margin:4px 0 10px}
+#msg{min-height:1.4em;font-weight:600;margin-bottom:8px;text-align:center}
+#grid{display:grid;gap:3px;width:min(96vw,calc(var(--S)*58px));grid-template-columns:repeat(var(--S),1fr);background:var(--card);padding:6px;border-radius:12px}
+.k{aspect-ratio:1;border-radius:6px;position:relative;background:var(--blk);overflow:hidden}
+.k.c{background:linear-gradient(to top right,transparent calc(50% - 1px),#334155 50%,transparent calc(50% + 1px)),var(--blk)}
+.k span{position:absolute;font-size:clamp(9px,2.6vw,14px);color:var(--b);font-weight:600}
+.k .a{top:3px;right:4px;color:var(--g)}.k .d{bottom:3px;left:4px}
+.w{background:var(--cell);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:clamp(16px,5vw,28px);font-weight:600}
+.w.h{background:#1b2c4f}.w.s{outline:2px solid var(--b);background:#223a68}
+.w.e{color:var(--r)}
+.n{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:100%;font-size:clamp(7px,2vw,11px);color:var(--m);font-weight:400;text-align:center;align-items:center}
+#pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px;width:min(96vw,340px)}
+#pad button{padding:12px 0;font-size:1.1rem}
+#combo{max-width:min(96vw,420px);color:var(--m);font-size:.88rem;margin-top:12px;line-height:1.5;min-height:3em}
+#combo b{color:var(--t)}
+[hidden]{display:none!important}
+#kk,#chess{display:flex;flex-direction:column;align-items:center}
+#cb{display:grid;grid-template-columns:repeat(8,1fr);width:min(96vw,420px);border-radius:8px;overflow:hidden;border:3px solid var(--b);margin:8px 0 12px}
+.q{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,44px);line-height:1;cursor:pointer;background:#111c33;user-select:none}
+.q.l{background:#1b2c4f}.q.s{outline:3px solid var(--g);outline-offset:-3px}
+.pw{color:#f1f5f9;text-shadow:0 0 6px #fff6}.pb{color:var(--r);text-shadow:0 0 6px #fb718566}
+#cinfo{color:var(--m);font-size:.9rem;margin:4px 0}
+#quor{display:flex;flex-direction:column;align-items:center}
+#qb{display:grid;grid-template-columns:repeat(8,1fr 6px) 1fr;grid-template-rows:repeat(8,auto 6px) auto;width:min(96vw,440px);background:var(--card);padding:6px;border-radius:12px;margin:8px 0 12px}
+.qc{aspect-ratio:1;background:var(--cell);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.qc.mv{background:#1f4a45}.qc i{width:62%;height:62%;border-radius:50%}
+.u1{background:var(--b);box-shadow:0 0 10px var(--b)}.u2{background:var(--r);box-shadow:0 0 10px var(--r)}
+.wl{background:#fbbf24;border-radius:3px;box-shadow:0 0 8px #fbbf2480}
+#onit{display:flex;flex-direction:column;align-items:center}
+#ob{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:min(80vw,340px);padding:6px;background:var(--card);border-radius:12px;margin:6px 0}
+.ocell{aspect-ratio:1;background:var(--cell);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ocell.tp{box-shadow:inset 0 0 0 2px #fbbf2466}.ocell.sl{outline:2px solid var(--g)}.ocell.mv{background:#1f4a45}
+.ocell i{width:56%;height:56%;border-radius:50%}.ocell i.m{width:74%;height:74%;box-shadow:0 0 0 3px #fbbf24}
+.orow{display:flex;gap:10px;justify-content:center;margin:4px 0 8px}.olab{color:var(--m);font-size:.8rem;margin-top:6px}
+.oc{background:var(--card);border:1px solid #243049;border-radius:8px;padding:5px;width:70px;text-align:center;font-size:.75rem;cursor:pointer}
+.oc.sel{border-color:var(--b)}.mg{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:3px}
+.mg u{aspect-ratio:1;background:#16213a}.mg u.ce{background:#64748b}.mg u.mk{background:var(--g)}
+#arim{display:flex;flex-direction:column;align-items:center}
+#ab{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;width:min(96vw,420px);padding:5px;background:var(--card);border-radius:12px;margin:6px 0}
+.ac{aspect-ratio:1;background:var(--cell);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ac.tr{background:#3b1a2a}.ac.sl{outline:2px solid var(--g)}.ac.mv{background:#1f4a45}.ac.pu{background:#4a3a1a}
+.ac i{width:82%;height:82%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:clamp(11px,3.6vw,18px);color:#030712}
+.ac i.fz{opacity:.5}
+#shog{display:flex;flex-direction:column;align-items:center}
+#sb{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;width:min(96vw,440px);background:#243049;padding:2px;border-radius:8px;margin:6px 0}
+.sc{aspect-ratio:1;background:#16213a;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sc.sl{outline:2px solid var(--g);outline-offset:-2px}.sc.mv{background:#1f4a45}.sc.ls{box-shadow:inset 0 0 0 2px #fbbf2480}
+.sp{width:86%;height:86%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(14px,4.4vw,24px);border-radius:6px 6px 3px 3px;background:#1e293b;border:1.5px solid}
+.sp.s0{color:var(--b);border-color:var(--b)}.sp.s1{color:var(--r);border-color:var(--r);transform:rotate(180deg)}.sp.pm{background:#3b1a2a}
+.shand{color:var(--m);font-size:.9rem;margin:2px 0;min-height:1.8em}.hp{margin:0 4px;padding:3px 8px;border-radius:6px;color:var(--t)}
+.q.tgt{background:#1f4a45}.mm{margin-bottom:6px}
+#cgb{display:grid;grid-template-columns:repeat(8,1fr);width:min(96vw,420px);border-radius:8px;overflow:hidden;border:3px solid var(--b);margin:8px 0 12px}
+</style></head><body>
+<h1>Puzzle Grind</h1>
+<div class="bar"><button id="tk" class="on">Kakuro</button><button id="tc">Chess</button><button id="tq">Quoridor</button><button id="to">Onitama</button><button id="ta">Arimaa</button><button id="ts">Shogi</button></div>
+<div class="bar" id="dfb" hidden><span style="color:var(--m);align-self:center">AI level:</span><button data-d="0">Easy</button><button data-d="1" class="on">Medium</button><button data-d="2">Hard</button></div>
+<div id="kk">
+<div class="bar" id="lv">
+<button data-l="easy">Easy 4×4</button><button data-l="med" class="on">Medium 6×6</button><button data-l="hard">Hard 8×8</button>
+</div>
+<div id="info"><span id="time">0:00</span><span id="stat"></span></div>
+<div id="msg"></div>
+<div id="grid"></div>
+<div id="pad"></div>
+<div class="bar" style="margin-top:10px">
+<button id="note">Notes: off</button><button id="check">Check</button><button id="new">New puzzle</button><button id="khint">Hint</button>
+</div>
+<div id="combo"></div>
+</div>
+<div id="chess" hidden>
+<div class="bar mm" data-g="c"><button class="on">Play</button><button>Puzzle</button></div>
+<div id="cgm" style="display:flex;flex-direction:column;align-items:center"><div id="cgmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div><div id="cgb"></div><div class="bar"><button id="cgn">New game</button></div><div style="max-width:420px;color:var(--m);font-size:.88rem">You are White. Pawns promote to a queen.</div></div>
+<div id="cpz" hidden style="flex-direction:column;align-items:center">
+<div id="cinfo">Mate in 1 · solved <span id="cn">0</span></div>
+<div id="cmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
+<div id="cb"></div>
+<div class="bar"><button id="chint">Hint</button><button id="csol">Show answer</button><button id="cnew">New puzzle</button></div>
+</div>
+</div>
+<div id="quor" hidden>
+<div class="bar mm" data-g="q"><button class="on">Play</button><button>Puzzle</button></div>
+<div id="qinfo" style="color:var(--m);font-size:.9rem;margin:4px 0"></div>
+<div id="qmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
+<div id="qb"></div>
+<div class="bar"><button id="qm" class="on">Move</button><button id="qw">Wall</button><button id="qo">Horizontal</button><button id="qn">New game</button><button id="qhint" hidden>Hint</button></div>
+<div style="max-width:420px;color:var(--m);font-size:.88rem;line-height:1.5">You are blue, starting at the bottom. Reach the top row first. Each turn, either move one step or place a wall. In Wall mode, tap a square: a horizontal wall goes under it and its right neighbour, a vertical wall goes to its right and its lower neighbour. Walls can never fully block a path.</div>
+</div>
+<div id="onit" hidden>
+<div class="bar mm" data-g="o"><button class="on">Play</button><button>Puzzle</button></div>
+<div id="omsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
+<div class="olab">AI cards</div><div class="orow" id="oai"></div>
+<div id="ob"></div>
+<div class="olab">Next card (goes to whoever uses a card)</div><div class="orow" id="omid"></div>
+<div class="olab">Your cards: pick one, then a piece, then a green square</div><div class="orow" id="ohu"></div>
+<div class="bar"><button id="onw">New game</button><button id="ohint" hidden>Hint</button></div>
+<div style="max-width:420px;color:var(--m);font-size:.88rem;line-height:1.5">You are blue at the bottom. Win by capturing the enemy master (the ringed piece), or by moving your master onto the enemy temple, the gold-edged square on their back row. The card you use goes to the middle, and you take the card that was there.</div>
+</div>
+<div id="arim" hidden>
+<div class="bar mm" data-g="a"><button class="on">Play</button><button>Puzzle</button></div>
+<div id="amsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
+<div id="ab"></div>
+<div class="bar"><button id="aun">Undo step</button><button id="aend">End turn</button><button id="anw">New game</button><button id="ahint" hidden>Hint</button></div>
+<div style="max-width:420px;color:var(--m);font-size:.88rem;line-height:1.5"><p>You are blue at the bottom. Each turn you get up to 4 steps. Strength order: E elephant, M camel, H horse, D dog, C cat, R rabbit. Win by getting a rabbit to the top row.</p><p><b style="color:var(--t)">Step:</b> tap your piece, then an empty neighbour. Rabbits cannot step backward.<br><b style="color:var(--t)">Push (2 steps):</b> tap your piece, tap a weaker enemy beside it, then an empty square next to that enemy.<br><b style="color:var(--t)">Pull (2 steps):</b> step away, then tap a weaker enemy beside the square you left.<br><b style="color:var(--t)">Frozen:</b> a dimmed piece sits next to a stronger enemy with no friend beside it, so it cannot move.<br><b style="color:var(--t)">Traps:</b> the four reddish squares capture any piece with no friend beside it.</p></div>
+</div>
+<div id="shog" hidden>
+<div class="bar mm" data-g="s"><button class="on">Play</button><button>Puzzle</button></div>
+<div id="smsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
+<div class="shand" id="sh1"></div>
+<div id="sb"></div>
+<div class="shand" id="sh0"></div>
+<div class="bar" id="spro"></div>
+<div class="bar"><button id="snw">New game</button><button id="shint" hidden>Hint</button></div>
+<div style="max-width:420px;color:var(--m);font-size:.88rem;line-height:1.5"><p>You are blue at the bottom. Tap a piece, then a green square. Captured pieces go to your hand: tap one there, then an empty square, to drop it. Pieces promote in the far three rows (they turn to a red tile). Win by checkmating the AI king (王).</p><p>歩 pawn, 香 lance, 桂 knight, 銀 silver, 金 gold, 角 bishop, 飛 rook, 玉 king. Promoted: と 杏 圭 全 move like gold, 馬 is a bishop that also steps sideways, 龍 is a rook that also steps diagonally. You cannot drop a second pawn in a file, or drop a pawn to give checkmate.</p></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script>
+const LV={easy:[4,.15],med:[6,.2],hard:[8,.22]};
+let level='med',S,cell,hid,vid,runs,order,clueH,clueV,user,notes,sel=-1,noteMode=false,done,showErr,t0,timer;
+const $=s=>document.querySelector(s);
+let stats={solved:0,best:{}};
+try{stats=Object.assign(stats,JSON.parse(localStorage.getItem('kak')||'{}'))}catch(e){}
+function save(){try{localStorage.setItem('kak',JSON.stringify(stats))}catch(e){}}
+
+function layout(n,p){S=n+1;
+ do{cell=Array(S*S).fill(0);
+  for(let r=1;r<S;r++)for(let c=1;c<S;c++)cell[r*S+c]=Math.random()>p?1:0;
+  let ch=true;
+  while(ch){ch=false;
+   for(let r=1;r<S;r++)for(let c=1;c<S;c++){const i=r*S+c;if(!cell[i])continue;
+    let h=1,v=1,x=c-1;while(x>0&&cell[r*S+x]){h++;x--}x=c+1;while(x<S&&cell[r*S+x]){h++;x++}
+    x=r-1;while(x>0&&cell[x*S+c]){v++;x--}x=r+1;while(x<S&&cell[x*S+c]){v++;x++}
+    if(h<2||v<2){cell[i]=0;ch=true}}}
+ }while(cell.reduce((a,b)=>a+b,0)<n*n*.55);
+}
+function build(){runs=[];hid=Array(S*S);vid=Array(S*S);clueH={};clueV={};order=[];
+ for(let r=1;r<S;r++)for(let c=1;c<S;c++){const i=r*S+c;if(!cell[i])continue;order.push(i);
+  if(!cell[i-1]){const run={cells:[],sum:0};for(let x=c;x<S&&cell[r*S+x];x++){run.cells.push(r*S+x);hid[r*S+x]=runs.length}clueH[i-1]=runs.length;runs.push(run)}
+  if(!cell[i-S]){const run={cells:[],sum:0};for(let x=r;x<S&&cell[x*S+c];x++){run.cells.push(x*S+c);vid[x*S+c]=runs.length}clueV[i-S]=runs.length;runs.push(run)}}}
+function fill(){const sol={},used=runs.map(()=>0);let nodes=0;
+ function rec(k){if(k===order.length)return true;if(++nodes>5000)return false;const i=order[k];
+  const ds=[1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-.5);
+  for(const d of ds){if((used[hid[i]]|used[vid[i]])>>d&1)continue;
+   used[hid[i]]|=1<<d;used[vid[i]]|=1<<d;sol[i]=d;if(rec(k+1))return true;
+   used[hid[i]]^=1<<d;used[vid[i]]^=1<<d}return false}
+ if(!rec(0))return false;runs.forEach(r=>r.sum=r.cells.reduce((a,i)=>a+sol[i],0));return true}
+function countSol(){let nodes=0,cnt=0;const v={},used=runs.map(()=>0),rem=runs.map(r=>r.sum),emp=runs.map(r=>r.cells.length);
+ function ok(r){const k=emp[r];if(!k)return rem[r]===0;let lo=0,hi=0,a=0,b=0;
+  for(let d=1;d<=9;d++)if(!(used[r]>>d&1)&&a<k){lo+=d;a++}
+  for(let d=9;d>=1;d--)if(!(used[r]>>d&1)&&b<k){hi+=d;b++}
+  return a===k&&rem[r]>=lo&&rem[r]<=hi}
+ function rec(){if(cnt>1||nodes>30000)return;nodes++;let bi=-1,bm=0,bc=99;
+  for(const i of order){if(v[i])continue;const m=~(used[hid[i]]|used[vid[i]])&0x3FE;let c=0,x=m;while(x){c++;x&=x-1}
+   if(c<bc){bc=c;bi=i;bm=m;if(c<=1)break}}
+  if(bi<0){cnt++;return}if(!bc)return;
+  const h=hid[bi],q=vid[bi];
+  for(let d=1;d<=9;d++){if(!(bm>>d&1))continue;
+   v[bi]=d;used[h]|=1<<d;used[q]|=1<<d;rem[h]-=d;rem[q]-=d;emp[h]--;emp[q]--;
+   if(ok(h)&&ok(q))rec();
+   v[bi]=0;used[h]^=1<<d;used[q]^=1<<d;rem[h]+=d;rem[q]+=d;emp[h]++;emp[q]++;
+   if(cnt>1||nodes>30000)return}}
+ rec();return nodes>30000?9:cnt}
+function generate(){const [n,p]=LV[level],T=Date.now();
+ do{layout(n,p);build();if(!fill())continue;if(countSol()===1)return}while(Date.now()-T<1200);
+ do{layout(n,p);build()}while(!fill())}
+function combos(k,s,must){const out=[];(function f(d,left,sum,cur){
+  if(left===0){if(sum===s&&must.every(m=>cur.includes(m)))out.push(cur.join(' '));return}
+  for(let x=d;x<=9;x++)f(x+1,left-1,sum+x,cur.concat(x))})(1,k,0,[]);return out}
+function peers(i){return[...runs[hid[i]].cells,...runs[vid[i]].cells]}
+function errors(){const e=new Set();
+ for(const r of runs){const seen={};for(const i of r.cells){const d=user[i];if(!d)continue;(seen[d]=seen[d]||[]).push(i)}
+  for(const d in seen)if(seen[d].length>1)seen[d].forEach(i=>e.add(i));
+  if(showErr&&r.cells.every(i=>user[i])&&r.cells.reduce((a,i)=>a+user[i],0)!==r.sum)r.cells.forEach(i=>e.add(i))}
+ return e}
+function solved(){return runs.every(r=>{const ds=r.cells.map(i=>user[i]);return ds.every(Boolean)&&new Set(ds).size===ds.length&&ds.reduce((a,b)=>a+b,0)===r.sum})}
+function render(){const g=$('#grid');g.style.setProperty('--S',S);g.innerHTML='';const er=errors();
+ const hl=new Set(sel>0?peers(sel):[]);
+ for(let i=0;i<S*S;i++){const d=document.createElement('div');
+  if(cell[i]){d.className='k w'+(hl.has(i)?' h':'')+(i===sel?' s':'')+(er.has(i)?' e':'');d.onclick=()=>{sel=i;render()};
+   if(user[i])d.textContent=user[i];else if(notes[i]){let h='<div class="n">';for(let x=1;x<=9;x++)h+='<span>'+(notes[i]>>x&1?x:'')+'</span>';d.innerHTML=h+'</div>'}}
+  else{d.className='k'+(i in clueH||i in clueV?' c':'');
+   let h='';if(i in clueH)h+='<span class="a">'+runs[clueH[i]].sum+'</span>';if(i in clueV)h+='<span class="d">'+runs[clueV[i]].sum+'</span>';d.innerHTML=h}
+  g.appendChild(d)}
+ let c='';if(sel>0){for(const [id,nm] of [[hid[sel],'Across'],[vid[sel],'Down']]){const r=runs[id],must=r.cells.map(i=>user[i]).filter(Boolean);
+  const l=combos(r.cells.length,r.sum,must);c+='<b>'+nm+' '+r.sum+' in '+r.cells.length+':</b> '+(l.length?l.join(' · '):'none fit')+'<br>'}}
+ $('#combo').innerHTML=c||'Tap a square to see which digit sets fit its runs.';
+ $('#stat').textContent='Solved: '+stats.solved+(stats.best[level]?' · Best '+fmt(stats.best[level]):'')}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function input(d){if(sel<0||done)return;showErr=false;
+ if(noteMode){if(!user[sel])notes[sel]^=1<<d}
+ else{user[sel]=user[sel]===d?0:d;notes[sel]=0;if(user[sel])for(const p of peers(sel))notes[p]&=~(1<<d)}
+ render();if(solved())win()}
+function erase(){if(sel<0||done)return;user[sel]=0;notes[sel]=0;showErr=false;render()}
+function win(){done=true;clearInterval(timer);const s=Math.round((Date.now()-t0)/1000);stats.solved++;
+ if(!stats.best[level]||s<stats.best[level])stats.best[level]=s;save();render();$('#msg').textContent='Solved in '+fmt(s)+'!'}
+function start(){generate();user={};notes={};order.forEach(i=>{user[i]=0;notes[i]=0});sel=-1;done=false;showErr=false;
+ $('#msg').textContent='';t0=Date.now();clearInterval(timer);
+ timer=setInterval(()=>{$('#time').textContent=fmt(Math.round((Date.now()-t0)/1000))},500);render()}
+const pad=$('#pad');for(let d=1;d<=9;d++){const b=document.createElement('button');b.textContent=d;b.onclick=()=>input(d);pad.appendChild(b)}
+const eb=document.createElement('button');eb.textContent='⌫';eb.onclick=erase;pad.appendChild(eb);
+$('#note').onclick=e=>{noteMode=!noteMode;e.target.textContent='Notes: '+(noteMode?'on':'off');e.target.classList.toggle('on',noteMode)};
+$('#check').onclick=()=>{showErr=true;render();if(!errors().size&&!done)$('#msg').textContent='No mistakes so far.';else $('#msg').textContent=''};
+$('#new').onclick=start;
+document.querySelectorAll('#lv button').forEach(b=>b.onclick=()=>{level=b.dataset.l;document.querySelectorAll('#lv button').forEach(x=>x.classList.toggle('on',x===b));start()});
+document.addEventListener('keydown',e=>{if(e.key>='1'&&e.key<='9')input(+e.key);
+ else if(e.key==='Backspace'||e.key==='Delete')erase();else if(e.key==='n'){$('#note').click()}
+ else if(sel>0&&e.key.startsWith('Arrow')){const dl={ArrowLeft:-1,ArrowRight:1,ArrowUp:-S,ArrowDown:S}[e.key];let j=sel+dl;
+  while(j>0&&j<S*S&&!cell[j])j+=dl;if(j>0&&j<S*S&&cell[j]){sel=j;render();e.preventDefault()}}});
+start();
+let ch=null,cs=null,cdone=false,cflip=false;
+function tab(t){const m={kk:'#kk',ch:'#chess',qu:'#quor',on:'#onit',ar:'#arim',sh:'#shog'},b={kk:'#tk',ch:'#tc',qu:'#tq',on:'#to',ar:'#ta',sh:'#ts'};for(const k in m){$(m[k]).hidden=k!==t;$(b[k]).classList.toggle('on',k===t)}if(t==='ch'&&!cg)cgNew();$('#dfb').hidden=t==='kk';if(t==='qu'&&!P)qNew();if(t==='on'&&!Os)oNew();if(t==='ar'&&!aB)aNew();if(t==='sh'&&!sB)sNew()}
+function chNew(){
+ if(typeof Chess==='undefined'){$('#cmsg').textContent='The chess library did not load. Check your connection.';return}
+ let g,k=0;
+ do{g=new Chess();for(let n=0;n<300&&!g.game_over();n++){const ms=g.moves();g.move(ms.find(s=>s.endsWith('#'))||ms[Math.random()*ms.length|0])}k++}
+ while(!(g.in_checkmate()&&g.history().length>=14)&&k<300);
+ g.undo();ch=g;cs=null;cdone=false;cflip=g.turn()==='b';
+ $('#cmsg').textContent=(cflip?'Black':'White')+' to move. Find checkmate in 1.';chRender()}
+function chRender(){const b=ch.board();let h='';
+ for(let i=0;i<64;i++){let r=i>>3,f=i&7;if(cflip){r=7-r;f=7-f}
+  const sq='abcdefgh'[f]+(8-r),p=b[r][f];
+  h+='<div class="q'+((r+f)%2?'':' l')+(sq===cs?' s':'')+(p?' p'+p.color:'')+'" data-s="'+sq+'">'+(p?'♚♛♜♝♞♟'['kqrbnp'.indexOf(p.type)]+'\uFE0E':'')+'</div>'}
+ $('#cb').innerHTML=h;$('#cn').textContent=stats.chess||0}
+function chClick(sq){if(cdone)return;const p=ch.get(sq);
+ if(cs&&cs!==sq){const c=ch.moves({verbose:true}).filter(m=>m.from===cs&&m.to===sq);
+  if(c.length){const m=c.find(x=>x.san.endsWith('#'));
+   if(m){ch.move(m.san);cdone=true;stats.chess=(stats.chess||0)+1;save();$('#cmsg').textContent='Checkmate! '+m.san}
+   else $('#cmsg').textContent='That is not mate. Try another move.';
+   cs=null;chRender();return}}
+ cs=p&&p.color===ch.turn()?sq:null;chRender()}
+$('#cb').onclick=e=>{const s=e.target.dataset.s;if(s&&ch)chClick(s)};
+$('#cnew').onclick=chNew;
+$('#chint').onclick=()=>{if(!ch||cdone)return;const m=ch.moves({verbose:true}).find(x=>x.san.endsWith('#'));cs=m.from;$('#cmsg').textContent='Look at the highlighted piece.';chRender()};
+$('#csol').onclick=()=>{if(!ch||cdone)return;$('#cmsg').textContent='Mate with: '+ch.moves().filter(s=>s.endsWith('#')).join(', ')};
+$('#tk').onclick=()=>tab('kk');$('#tc').onclick=()=>tab('ch');$('#tq').onclick=()=>tab('qu');
+let P=null,H,V,qt,qdone,qwall=false,qh=true;const D=[[1,0],[-1,0],[0,1],[0,-1]];
+const hb=(r,c)=>r>=0&&r<=7&&c>=0&&c<=7&&H[r*8+c],vb=(r,c)=>r>=0&&r<=7&&c>=0&&c<=7&&V[r*8+c];
+function step(r,c,a,b){const R=r+a,C=c+b;if(R<0||R>8||C<0||C>8)return false;
+ if(a===1)return !(hb(r,c)||hb(r,c-1));if(a===-1)return !(hb(r-1,c)||hb(r-1,c-1));
+ if(b===1)return !(vb(r,c)||vb(r-1,c));return !(vb(r,c-1)||vb(r-1,c-1))}
+function dist(r,c,g){const d=Array(81).fill(-1),q=[r*9+c];d[q[0]]=0;
+ for(let k=0;k<q.length;k++){const i=q[k],y=i/9|0,x=i%9;if(y===g)return d[i];
+  for(const [a,b] of D)if(step(y,x,a,b)){const j=(y+a)*9+x+b;if(d[j]<0){d[j]=d[i]+1;q.push(j)}}}return 99}
+function pmoves(p,o){const out=[];for(const [a,b] of D){if(!step(p.r,p.c,a,b))continue;const R=p.r+a,C=p.c+b;
+  if(R===o.r&&C===o.c){if(step(R,C,a,b))out.push([R+a,C+b]);else for(const [e,f] of D)if(e*a+f*b===0&&step(R,C,e,f))out.push([R+e,C+f])}
+  else out.push([R,C])}return out}
+function wallOk(h,r,c){const A=h?H:V,B=h?V:H;if(r<0||r>7||c<0||c>7||A[r*8+c]||B[r*8+c])return false;
+ if(h){if((c>0&&H[r*8+c-1])||(c<7&&H[r*8+c+1]))return false}else if((r>0&&V[(r-1)*8+c])||(r<7&&V[(r+1)*8+c]))return false;
+ A[r*8+c]=1;const ok=dist(P[0].r,P[0].c,0)<99&&dist(P[1].r,P[1].c,8)<99;A[r*8+c]=0;return ok}
+function qNew(){P=[{r:8,c:4,w:10},{r:0,c:4,w:10}];H=Array(64).fill(0);V=Array(64).fill(0);qt=0;qdone=false;$('#qmsg').textContent='Your move.';qRender()}
+function qRender(){let h='';const lm=!qdone&&qt===0&&!qwall?pmoves(P[0],P[1]):[];
+ for(let r=0;r<9;r++)for(let c=0;c<9;c++){const u=P[0].r===r&&P[0].c===c?1:P[1].r===r&&P[1].c===c?2:0;
+  h+='<div class="qc'+(lm.some(m=>m[0]===r&&m[1]===c)?' mv':'')+'" style="grid-row:'+(2*r+1)+';grid-column:'+(2*c+1)+'" data-r="'+r+'" data-c="'+c+'">'+(u?'<i class="u'+u+'"></i>':'')+'</div>'}
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+  if(H[r*8+c])h+='<b class="wl" style="grid-row:'+(2*r+2)+';grid-column:'+(2*c+1)+'/span 3"></b>';
+  if(V[r*8+c])h+='<b class="wl" style="grid-column:'+(2*c+2)+';grid-row:'+(2*r+1)+'/span 3"></b>'}
+ $('#qb').innerHTML=h;$('#qinfo').textContent='You: '+P[0].w+' walls \u00b7 AI: '+P[1].w+' walls'}
+function qEnd(){if(P[0].r===0){qdone=true;$('#qmsg').textContent='You win!'}else if(P[1].r===8){qdone=true;$('#qmsg').textContent='The AI wins this one.'}
+ if(qdone){qRender();return true}return false}
+function qClick(r,c){if(qdone||qt!==0)return;
+ if(qPz){const R=Math.min(r,7),C=Math.min(c,7);if(!wallOk(qh,R,C)){$('#qmsg').textContent='That wall is not allowed there.';return}
+  const A=qh?H:V;A[R*8+C]=1;const inc=dist(P[1].r,P[1].c,8)-qBase;
+  if(inc>=qBest){qdone=true;$('#qmsg').textContent='Solved! Your wall adds '+inc+' steps.'}
+  else{A[R*8+C]=0;$('#qmsg').textContent='That adds only '+inc+'. Find a stronger wall.'}
+  qRender();return}
+ if(qwall){const R=Math.min(r,7),C=Math.min(c,7);if(P[0].w<1){$('#qmsg').textContent='You are out of walls.';return}
+  if(!wallOk(qh,R,C)){$('#qmsg').textContent='That wall is not allowed there.';return}
+  (qh?H:V)[R*8+C]=1;P[0].w--}
+ else{if(!pmoves(P[0],P[1]).some(m=>m[0]===r&&m[1]===c))return;P[0].r=r;P[0].c=c}
+ if(qEnd())return;qt=1;$('#qmsg').textContent='AI is thinking\u2026';qRender();setTimeout(qai,400)}
+function qai(){if(qdone)return;const me=P[1],op=P[0];let best=-9e9,act=null;const od=dist(op.r,op.c,0);
+ for(const [R,C] of pmoves(me,op)){const s=(R===8?1e6:od-dist(R,C,8))+NZ(.3);if(s>best){best=s;act=[0,R,C]}}
+ if(me.w>0)for(const h of [1,0])for(let r=0;r<8;r++)for(let c=0;c<8;c++){if(!wallOk(h,r,c))continue;
+  const A=h?H:V;A[r*8+c]=1;const s=dist(op.r,op.c,0)-dist(me.r,me.c,8)-[1.5,.8,.4][dif]+NZ(.3);A[r*8+c]=0;if(s>best){best=s;act=[h?1:2,r,c]}}
+ if(act[0]===0){me.r=act[1];me.c=act[2]}else{(act[0]===1?H:V)[act[1]*8+act[2]]=1;me.w--}
+ if(qEnd())return;qt=0;$('#qmsg').textContent='Your move.';qRender()}
+$('#qb').onclick=e=>{const d=e.target.closest('.qc');if(d)qClick(+d.dataset.r,+d.dataset.c)};
+function qMode(w){qwall=w;$('#qm').classList.toggle('on',!w);$('#qw').classList.toggle('on',w);if(P)qRender()}
+$('#qm').onclick=()=>qMode(false);$('#qw').onclick=()=>qMode(true);
+$('#qo').onclick=e=>{qh=!qh;e.target.textContent=qh?'Horizontal':'Vertical'};
+$('#qn').onclick=qNew;
+$('#to').onclick=()=>tab('on');
+const OC=[['Tiger',[[0,2],[0,-1]]],['Dragon',[[-2,1],[2,1],[-1,-1],[1,-1]]],['Frog',[[-2,0],[-1,1],[1,-1]]],['Rabbit',[[2,0],[1,1],[-1,-1]]],['Crab',[[-2,0],[2,0],[0,1]]],['Elephant',[[-1,1],[1,1],[-1,0],[1,0]]],['Goose',[[-1,1],[-1,0],[1,0],[1,-1]]],['Rooster',[[1,1],[-1,0],[1,0],[-1,-1]]],['Monkey',[[-1,1],[1,1],[-1,-1],[1,-1]]],['Mantis',[[-1,1],[1,1],[0,-1]]],['Horse',[[-1,0],[0,1],[0,-1]]],['Ox',[[1,0],[0,1],[0,-1]]],['Crane',[[0,1],[-1,-1],[1,-1]]],['Boar',[[-1,0],[1,0],[0,1]]],['Eel',[[-1,1],[-1,-1],[1,0]]],['Cobra',[[-1,0],[1,1],[1,-1]]]];
+let Os=null,Ot=0,osl=-1,opc=-1,ODone=false;
+const oOwn=v=>v?(v<3?0:1):-1;
+function oGen(s,p){const out=[];for(let k=0;k<2;k++)for(let i=0;i<25;i++){if(oOwn(s.b[i])!==p)continue;
+  for(const [dx,dy] of OC[s.h[p][k]][1]){const r=(i/5|0)+(p?dy:-dy),c=i%5+(p?-dx:dx);
+   if(r>=0&&r<5&&c>=0&&c<5&&oOwn(s.b[r*5+c])!==p)out.push({slot:k,from:i,to:r*5+c})}}return out}
+function oApply(s,m,p){const b=s.b.slice(),cap=b[m.to];b[m.to]=b[m.from];b[m.from]=0;
+ const h=[s.h[0].slice(),s.h[1].slice()],u=h[p][m.slot];h[p][m.slot]=s.m;return{b,h,m:u,cap}}
+function oWins(n,m,p){return n.cap===(p?2:4)||(n.b[m.to]===(p?4:2)&&m.to===(p?22:2))}
+function oEv(s){let v=0;for(let i=0;i<25;i++){const x=s.b[i];if(!x)continue;const r=i/5|0,c=i%5;
+ if(x===3)v+=10+r*.5;else if(x===4)v+=r*.5-((4-r)+Math.abs(c-2))*.3;else if(x===1)v-=10+(4-r)*.5;else v+=-(4-r)*.5+(r+Math.abs(c-2))*.3}return v}
+function oSrch(s,p,d,al,be){const ms=oGen(s,p);if(!ms.length)return 0;let best=p?-1e9:1e9;
+ for(const m of ms){const n=oApply(s,m,p);let v;
+  if(oWins(n,m,p))v=p?1000+d:-1000-d;else if(d===0)v=oEv(n);else v=oSrch(n,1-p,d-1,al,be);
+  if(p){if(v>best)best=v;al=Math.max(al,v)}else{if(v<best)best=v;be=Math.min(be,v)}
+  if(be<=al)break}return best}
+function oNew(){const ids=[...Array(16).keys()].sort(()=>Math.random()-.5);
+ Os={b:[3,3,4,3,3,...Array(15).fill(0),1,1,2,1,1],h:[[ids[0],ids[1]],[ids[2],ids[3]]],m:ids[4]};
+ Ot=0;osl=-1;opc=-1;ODone=false;$('#omsg').textContent='Your move.';oRender()}
+function oCard(ci,flip,sel,attr){const set=new Set(OC[ci][1].map(([dx,dy])=>(flip?2+dy:2-dy)*5+(flip?2-dx:2+dx)));let g='';
+ for(let i=0;i<25;i++)g+='<u class="'+(i===12?'ce':set.has(i)?'mk':'')+'"></u>';
+ return '<div class="oc'+(sel?' sel':'')+'" '+attr+'><b>'+OC[ci][0]+'</b><div class="mg">'+g+'</div></div>'}
+function oRender(){const s=Os,tg=new Set();
+ if(!ODone&&Ot===0&&osl>=0&&opc>=0)oGen(s,0).forEach(m=>{if(m.slot===osl&&m.from===opc)tg.add(m.to)});
+ let h='';for(let i=0;i<25;i++){const v=s.b[i];
+  h+='<div class="ocell'+((i===2||i===22)?' tp':'')+(i===opc?' sl':'')+(tg.has(i)?' mv':'')+'" data-i="'+i+'">'+(v?'<i class="u'+(v<3?1:2)+((v===2||v===4)?' m':'')+'"></i>':'')+'</div>'}
+ $('#ob').innerHTML=h;
+ $('#oai').innerHTML=s.h[1].map(c=>oCard(c,1,false,'')).join('');
+ $('#omid').innerHTML=oCard(s.m,0,false,'');
+ $('#ohu').innerHTML=s.h[0].map((c,k)=>oCard(c,0,k===osl,'data-k="'+k+'"')).join('')}
+function oEnd(n,m,p){if(oWins(n,m,p)){ODone=true;$('#omsg').textContent=p?'The AI wins this one.':'You win!';return true}return false}
+$('#ohu').onclick=e=>{const d=e.target.closest('.oc');if(!d||ODone||Ot!==0)return;osl=+d.dataset.k;opc=-1;oRender()};
+$('#ob').onclick=e=>{const d=e.target.closest('.ocell');if(!d||ODone||Ot!==0)return;const i=+d.dataset.i;
+ if(osl<0){$('#omsg').textContent='Pick a card first.';return}
+ if(oOwn(Os.b[i])===0){opc=i;oRender();return}
+ const m=oGen(Os,0).find(x=>x.slot===osl&&x.from===opc&&x.to===i);if(!m)return;
+ if(oPz){const q=oApply(Os,m,0);if(oWins(q,m,0)){Os=q;ODone=true;$('#omsg').textContent='Solved! That move wins.'}else $('#omsg').textContent='That does not win. Try another.';osl=-1;opc=-1;oRender();return}
+ const n=oApply(Os,m,0);Os=n;osl=-1;opc=-1;
+ if(oEnd(n,m,0)){oRender();return}
+ Ot=1;$('#omsg').textContent='AI is thinking\u2026';oRender();setTimeout(oAI,450)};
+function oAI(){if(ODone)return;const ms=oGen(Os,1);let best=-1e9,pick=null;
+ for(const m of ms){const n=oApply(Os,m,1);const v=(oWins(n,m,1)?1e5:oSrch(n,0,dif,-1e9,1e9))+NZ(.3);if(v>best){best=v;pick=m}}
+ if(pick){const n=oApply(Os,pick,1);Os=n;if(oEnd(n,pick,1)){oRender();return}}
+ Ot=0;$('#omsg').textContent='Your move.';oRender()}
+$('#onw').onclick=oNew;
+$('#ta').onclick=()=>tab('ar');
+const aNB=[...Array(64)].map((_,i)=>{const r=i>>3,c=i&7,o=[];if(r>0)o.push(i-8);if(r<7)o.push(i+8);if(c>0)o.push(i-1);if(c<7)o.push(i+1);return o});
+const aTr=[18,21,42,45],aW=[0,2,3,4,5,8,12],aL=' RCDHME';
+let aB=null,aT=0,aKs=4,aSel=-1,aPush=null,aPull=null,aDone=false,aHist=[];
+function aFz(b,i){const p=b[i],sd=p>>3,st=p&7;let f=false,s=false;for(const n of aNB[i]){const q=b[n];if(!q)continue;if(q>>3===sd)f=true;else if((q&7)>st)s=true}return s&&!f}
+function aTrap(b){for(const t of aTr){const p=b[t];if(p&&!aNB[t].some(n=>b[n]&&b[n]>>3===p>>3))b[t]=0}}
+function aGen(b,sd,ks){const out=[];
+ for(let i=0;i<64;i++){const p=b[i];if(!p||p>>3!==sd||aFz(b,i))continue;const st=p&7;
+  for(const j of aNB[i]){
+   if(!b[j]){if(st===1&&j===i+(sd?-8:8))continue;out.push({t:0,i,j,c:1});
+    if(ks>=2)for(const e of aNB[i])if(b[e]&&b[e]>>3!==sd&&(b[e]&7)<st)out.push({t:2,i,j,e,c:2})}
+   else if(ks>=2&&b[j]>>3!==sd&&(b[j]&7)<st)for(const k of aNB[j])if(!b[k])out.push({t:1,i,j,k,c:2})}}
+ return out}
+function aApp(b,a){const n=b.slice();
+ if(a.t===0){n[a.j]=n[a.i];n[a.i]=0}
+ else if(a.t===1){n[a.k]=n[a.j];n[a.j]=n[a.i];n[a.i]=0}
+ else{n[a.j]=n[a.i];n[a.i]=n[a.e];n[a.e]=0}
+ aTrap(n);return n}
+function aWinner(b){let g=0,s=0;for(let i=0;i<64;i++){if(b[i]===1){g++;if(i<8)return 0}else if(b[i]===9){s++;if(i>55)return 1}}return !g?1:!s?0:-1}
+function aEv(b){const w=aWinner(b);if(w===1)return 1e4;if(w===0)return -1e4;let v=0;
+ for(let i=0;i<64;i++){const p=b[i];if(!p)continue;const sd=p>>3,st=p&7,r=i>>3;
+  let x=aW[st]+(st===1?(sd?r*.4+(r===6?2:0):(7-r)*.6+(r===1?4:0)):0);
+  if(aFz(b,i))x*=.85;v+=sd?x:-x}return v}
+function aNew(){aB=Array(64).fill(0);const bk=[3,4,2,6,5,2,4,3];
+ for(let c=0;c<8;c++){aB[c]=8+bk[c];aB[8+c]=9;aB[48+c]=1;aB[56+c]=bk[c]}
+ aT=0;aKs=4;aSel=-1;aPush=null;aPull=null;aDone=false;aHist=[];$('#amsg').textContent='Your move. Steps left: 4';aRender()}
+function aMsg(){$('#amsg').textContent='Steps left: '+aKs+(aPull?' - tap a weaker enemy to pull it':'')}
+function aEnd(){const w=aWinner(aB);if(w<0)return false;aDone=true;$('#amsg').textContent=w===0?'You win!':'The AI wins this one.';return true}
+function aSnap(){aHist.push({b:aB.slice(),k:aKs})}
+function aAfter(){if(aEnd()){aRender();return}if(aKs===0){aFinish();return}aMsg();aRender()}
+function aFinish(){if(aDone||aT!==0||aKs===4)return;
+ if(aPz){$('#amsg').textContent='Out of steps. Use Undo step to try again.';aRender();return}aT=1;aSel=-1;aPush=null;aPull=null;$('#amsg').textContent='AI is thinking...';aRender();setTimeout(aAI,450)}
+function aRender(){let h='';const b=aB,tg=new Set(),tg2=new Set();
+ if(!aDone&&aT===0){
+  if(aPush)aNB[aPush.e].forEach(n=>{if(!b[n])tg.add(n)});
+  else if(aPull)aNB[aPull.old].forEach(n=>{const q=b[n];if(q&&q>>3===1&&(q&7)<(b[aPull.mover]&7))tg2.add(n)});
+  else if(aSel>=0&&b[aSel]&&!aFz(b,aSel)){const sp=b[aSel];aNB[aSel].forEach(n=>{const q=b[n];if(!q){if(!((sp&7)===1&&n===aSel+8)&&aKs>=1)tg.add(n)}else if(q>>3===1&&(q&7)<(sp&7)&&aKs>=2)tg2.add(n)})}}
+ for(let i=0;i<64;i++){const p=b[i];
+  h+='<div class="ac'+(aTr.includes(i)?' tr':'')+(i===aSel?' sl':'')+(tg.has(i)?' mv':'')+(tg2.has(i)?' pu':'')+'" data-i="'+i+'">'+(p?'<i class="u'+((p>>3)?2:1)+(aFz(b,i)?' fz':'')+'">'+aL[p&7]+'</i>':'')+'</div>'}
+ $('#ab').innerHTML=h}
+function aClick(i){if(aDone||aT!==0)return;const b=aB,p=b[i];
+ if(aPush){const o=aPush.i,e=aPush.e;aPush=null;
+  if(!b[i]&&aNB[e].includes(i)&&aKs>=2){aSnap();aB=aApp(b,{t:1,i:o,j:e,k:i});aKs-=2;aSel=-1;aPull=null;aAfter();return}}
+ if(aPull){const pl=aPull;aPull=null;
+  if(p&&p>>3===1&&aNB[pl.old].includes(i)&&(p&7)<(b[pl.mover]&7)&&aKs>=1){aSnap();const n=b.slice();n[pl.old]=n[i];n[i]=0;aTrap(n);aB=n;aKs--;aSel=-1;aAfter();return}}
+ if(p&&p>>3===0){aSel=i;aRender();return}
+ if(aSel<0||!aNB[aSel].includes(i)){aRender();return}
+ const s=aSel,sp=b[s];if(!sp||aFz(b,s)){aSel=-1;aRender();return}
+ if(!p){if(((sp&7)===1&&i===s+8)||aKs<1){aRender();return}
+  aSnap();aB=aApp(b,{t:0,i:s,j:i});aKs--;aSel=i;
+  if(aKs>=1&&aNB[s].some(e=>aB[e]&&aB[e]>>3===1&&(aB[e]&7)<(sp&7)))aPull={old:s,mover:i};
+  aAfter();return}
+ if((p&7)<(sp&7)&&aKs>=2){aPush={i:s,e:i};aRender()}else aRender()}
+function aAI(){if(aDone)return;let ks=4,n=0;
+ while(ks>0){const acts=aGen(aB,1,ks);if(!acts.length)break;const cur=aEv(aB);let best=-1e9,pick=null,bb=null;
+  for(const a of acts){const nb=aApp(aB,a),v=aEv(nb)+NZ(.4);if(v>best){best=v;pick=a;bb=nb}}
+  if(n>0&&best<cur)break;aB=bb;ks-=pick.c;n++;if(aWinner(aB)>=0)break}
+ if(!n){aDone=true;$('#amsg').textContent='You win: the AI cannot move.';aRender();return}
+ aT=0;aKs=4;aHist=[];if(aEnd()){aRender();return}$('#amsg').textContent='Your move. Steps left: 4';aRender()}
+$('#ab').onclick=e=>{const d=e.target.closest('.ac');if(d)aClick(+d.dataset.i)};
+$('#aun').onclick=()=>{if(aDone||aT!==0||!aHist.length)return;const h=aHist.pop();aB=h.b;aKs=h.k;aSel=-1;aPush=null;aPull=null;aMsg();aRender()};
+$('#aend').onclick=aFinish;$('#anw').onclick=aNew;
+$('#ts').onclick=()=>tab('sh');
+const SK=' 歩香桂銀金角飛玉と杏圭全馬龍'.split(''),SV=[0,1,3,4,5,6,8,10,0,6,6,6,6,10,12],BASE=[0,1,2,3,4,5,6,7,8,1,2,3,4,6,7];
+const SG=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,0]],SS=[[-1,-1],[-1,0],[-1,1],[1,-1],[1,1]],S8=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]],DG=[[-1,-1],[-1,1],[1,-1],[1,1]],OR=[[-1,0],[1,0],[0,-1],[0,1]];
+const SM=[0,[[[-1,0]],[],[]],[[],[[-1,0]],[]],[[],[],[[-2,-1],[-2,1]]],[SS,[],[]],[SG,[],[]],[[],DG,[]],[[],OR,[]],[S8,[],[]],[SG,[],[]],[SG,[],[]],[SG,[],[]],[SG,[],[]],[OR,DG,[]],[DG,OR,[]]];
+let sB=null,sH,sT=0,sSel=-1,sDrop=0,sLM=[],sPend=null,sDone=false,sLast=-1;
+function sGen(b,h,sd,dr){const out=[],f=sd?-1:1;
+ for(let i=0;i<81;i++){const p=b[i];if(!p||p>>4!==sd)continue;const tp=p&15,r=i/9|0,c=i%9,m=SM[tp];
+  const t=(R,C)=>{if(R<0||R>8||C<0||C>8)return 0;const q=b[R*9+C];if(q&&q>>4===sd)return 0;const to=R*9+C;
+   if(tp<=7&&tp!==5&&(sd?(r>=6||R>=6):(r<=2||R<=2))){
+    const dead=((tp===1||tp===2)&&(sd?R===8:R===0))||(tp===3&&(sd?R>=7:R<=1));
+    if(!dead)out.push({f:i,t:to,p:0});out.push({f:i,t:to,p:1})}
+   else out.push({f:i,t:to,p:0});return q?2:1};
+  for(const [a,d] of m[0])t(r+f*a,c+d);
+  for(const [a,d] of m[1]){let k=1;while(t(r+f*a*k,c+d*k)===1)k++}
+  for(const [a,d] of m[2])t(r+f*a,c+d)}
+ if(dr)for(let tp=1;tp<=7;tp++){if(!h[sd][tp])continue;
+  for(let i=0;i<81;i++){if(b[i])continue;const R=i/9|0,C=i%9;
+   if((tp===1||tp===2)&&(sd?R===8:R===0))continue;if(tp===3&&(sd?R>=7:R<=1))continue;
+   if(tp===1){let dup=false;for(let k=0;k<9;k++)if(b[k*9+C]===(1|sd<<4))dup=true;if(dup)continue}
+   out.push({f:-tp,t:i,p:0})}}
+ return out}
+function sApp(b,h,m,sd){const nb=b.slice(),nh=[h[0].slice(),h[1].slice()];let cap=0;
+ if(m.f<0){nb[m.t]=(-m.f)|(sd<<4);nh[sd][-m.f]--}
+ else{const q=nb[m.t];if(q){cap=q&15;if(cap!==8)nh[sd][BASE[cap]]++}
+  let tp=nb[m.f]&15;if(m.p)tp+=tp>=6?7:8;nb[m.t]=tp|(sd<<4);nb[m.f]=0}
+ return{b:nb,h:nh,cap}}
+function sChk(b,sd){let k=-1;for(let i=0;i<81;i++)if(b[i]===(8|(sd<<4))){k=i;break}if(k<0)return true;
+ return sGen(b,[[],[]],1-sd,false).some(m=>m.t===k)}
+function sAny(b,h,sd){for(const m of sGen(b,h,sd,true)){const n=sApp(b,h,m,sd);if(!sChk(n.b,sd))return true}return false}
+function sLegal(b,h,sd){const out=[];for(const m of sGen(b,h,sd,true)){const n=sApp(b,h,m,sd);if(sChk(n.b,sd))continue;
+  if(m.f===-1&&sChk(n.b,1-sd)&&!sAny(n.b,n.h,1-sd))continue;out.push(m)}return out}
+function sEv(b,h){let v=0;for(let i=0;i<81;i++){const p=b[i];if(!p)continue;const r=i/9|0,x=SV[p&15]+((p&15)===1?(p>>4?r:8-r)*.1:0);v+=p>>4?x:-x}
+ for(let t=1;t<=7;t++)v+=(h[1][t]-h[0][t])*SV[t]*1.05;return v}
+function sNew(){sB=Array(81).fill(0);const bk=[2,3,4,5,8,5,4,3,2];
+ for(let c=0;c<9;c++){sB[c]=bk[c]|16;sB[18+c]=17;sB[54+c]=1;sB[72+c]=bk[c]}
+ sB[10]=23;sB[16]=22;sB[64]=6;sB[70]=7;
+ sH=[Array(9).fill(0),Array(9).fill(0)];sT=0;sSel=-1;sDrop=0;sPend=null;sDone=false;sLast=-1;sLM=sLegal(sB,sH,0);
+ $('#smsg').textContent='Your move.';sRender()}
+function sRender(){const tg=new Set();
+ if(!sDone&&sT===0)sLM.forEach(m=>{if(sDrop?m.f===-sDrop:m.f===sSel)tg.add(m.t)});
+ let h='';for(let i=0;i<81;i++){const p=sB[i],sd=p>>4,tp=p&15;
+  h+='<div class="sc'+(i===sSel?' sl':'')+(tg.has(i)?' mv':'')+(i===sLast?' ls':'')+'" data-i="'+i+'">'+(p?'<b class="sp s'+sd+(tp>8?' pm':'')+'">'+((tp===8&&sd)?'王':SK[tp])+'</b>':'')+'</div>'}
+ $('#sb').innerHTML=h;
+ const hv=(s,btn)=>{let x='';for(let t=1;t<=7;t++)if(sH[s][t])x+=(btn?'<button class="hp'+(sDrop===t?' on':'')+'" data-t="'+t+'">':'<span class="hp">')+SK[t]+'×'+sH[s][t]+(btn?'</button>':'</span>');return x};
+ $('#sh1').innerHTML='AI hand: '+hv(1,false);$('#sh0').innerHTML='Your hand: '+hv(0,true);
+ $('#spro').innerHTML=sPend?'<button id="spy">Promote</button><button id="spn">Do not promote</button>':''}
+function sDo(m){const n=sApp(sB,sH,m,0);
+ if(sPz){if(sChk(n.b,1)&&!sAny(n.b,n.h,1)){sB=n.b;sH=n.h;sLast=m.t;sDone=true;$('#smsg').textContent='Checkmate! Solved.'}else $('#smsg').textContent='That is not mate. Try another move.';sSel=-1;sDrop=0;sPend=null;sRender();return}
+ sB=n.b;sH=n.h;sLast=m.t;sSel=-1;sDrop=0;sPend=null;
+ if(!sLegal(sB,sH,1).length){sDone=true;sT=2;$('#smsg').textContent='Checkmate. You win!';sRender();return}
+ sT=1;$('#smsg').textContent='AI is thinking...';sRender();setTimeout(sAI,400)}
+function sClick(i){if(sDone||sT!==0)return;const p=sB[i];
+ if(sSel>=0||sDrop){const ms=sLM.filter(m=>m.t===i&&(sDrop?m.f===-sDrop:m.f===sSel));
+  if(ms.length){if(ms.length>1){sPend=ms;sRender();return}sDo(ms[0]);return}}
+ sPend=null;if(p&&p>>4===0){sSel=i;sDrop=0}else{sSel=-1;sDrop=0}sRender()}
+function sAI(){if(sDone)return;const ms=sLegal(sB,sH,1);
+ if(!ms.length){sDone=true;$('#smsg').textContent='Checkmate. You win!';sRender();return}
+ let best=-1e9,pick=null;
+ for(const m of ms){const n=sApp(sB,sH,m,1);let v;
+  if(n.cap===8)v=9999;else{v=1e9;for(const r of sGen(n.b,n.h,0,true)){const n2=sApp(n.b,n.h,r,0);const x=n2.cap===8?-9999:sEv(n2.b,n2.h);if(x<v)v=x;if(v<best)break}}
+  v+=NZ(.3);if(v>best){best=v;pick=m}}
+ const n=sApp(sB,sH,pick,1);sB=n.b;sH=n.h;sLast=pick.t;sT=0;sLM=sLegal(sB,sH,0);
+ if(!sLM.length){sDone=true;$('#smsg').textContent='Checkmate. The AI wins.'}else $('#smsg').textContent=sChk(sB,0)?'Check! Your move.':'Your move.';
+ sRender()}
+$('#sb').onclick=e=>{const d=e.target.closest('.sc');if(d)sClick(+d.dataset.i)};
+$('#sh0').onclick=e=>{const b=e.target.closest('button');if(!b||sDone||sT!==0)return;const t=+b.dataset.t;sDrop=sDrop===t?0:t;sSel=-1;sPend=null;sRender()};
+$('#spro').onclick=e=>{if(!sPend)return;const id=e.target.id;if(id==='spy'||id==='spn'){const m=sPend.find(x=>x.p===(id==='spy'?1:0));sPend=null;if(m)sDo(m)}};
+$('#snw').onclick=sNew;
+let dif=1,qPz=false,qBest=0,qBase=0,oPz=false,aPz=false,sPz=false,cg=null,cgs=null,cgd=false;
+const NZ=k=>Math.random()*k*[10,1,.15][dif],CV={p:100,n:320,b:330,r:500,q:900,k:0};
+document.querySelectorAll('#dfb button').forEach(b=>b.onclick=()=>{dif=+b.dataset.d;document.querySelectorAll('#dfb button').forEach(x=>x.classList.toggle('on',x===b))});
+function setMode(g,pz){const hb={q:'#qhint',o:'#ohint',a:'#ahint',s:'#shint'}[g];if(hb)$(hb).hidden=!pz;if(g==='c'){$('#cgm').hidden=pz;$('#cpz').hidden=!pz;$('#cpz').style.display=pz?'flex':'none';if(pz)chNew();return}
+ if(g==='q'){qPz=pz;qMode(pz);pz?qPuz():qNew()}
+ else if(g==='o'){oPz=pz;pz?oPuz():oNew()}
+ else if(g==='a'){aPz=pz;pz?aPuz():aNew()}
+ else{sPz=pz;pz?sPuz():sNew()}}
+document.querySelectorAll('.mm').forEach(bar=>{const bs=bar.querySelectorAll('button');bs.forEach((b,k)=>b.onclick=()=>{bs.forEach((x,j)=>x.classList.toggle('on',j===k));setMode(bar.dataset.g,k===1)})});
+function cgNew(){if(typeof Chess==='undefined'){$('#cgmsg').textContent='The chess library did not load.';return}cg=new Chess();cgs=null;cgd=false;$('#cgmsg').textContent='Your move (White).';cgR()}
+function cgR(){const b=cg.board(),tg=new Set();let h='';if(cgs)cg.moves({square:cgs,verbose:true}).forEach(m=>tg.add(m.to));
+ for(let i=0;i<64;i++){const r=i>>3,f=i&7,sq='abcdefgh'[f]+(8-r),p=b[r][f];
+  h+='<div class="q'+((r+f)%2?'':' l')+(sq===cgs?' s':'')+(tg.has(sq)?' tgt':'')+(p?' p'+p.color:'')+'" data-s="'+sq+'">'+(p?'♚♛♜♝♞♟'['kqrbnp'.indexOf(p.type)]+'\uFE0E':'')+'</div>'}
+ $('#cgb').innerHTML=h}
+function cgAfter(){cgR();if(cg.game_over()){cgd=true;$('#cgmsg').textContent=cg.in_checkmate()?(cg.turn()==='b'?'Checkmate. You win!':'Checkmate. The AI wins.'):'Draw.';return}
+ $('#cgmsg').textContent=cg.turn()==='b'?'AI is thinking...':(cg.in_check()?'Check! Your move.':'Your move.');
+ if(cg.turn()==='b')setTimeout(cgAI,300)}
+$('#cgb').onclick=e=>{const s=e.target.dataset.s;if(!s||!cg||cgd||cg.turn()!=='w')return;const p=cg.get(s);
+ if(cgs&&cg.moves({square:cgs,verbose:true}).some(x=>x.to===s)){cg.move({from:cgs,to:s,promotion:'q'});cgs=null;cgAfter();return}
+ cgs=p&&p.color==='w'?s:null;cgR()};
+function cgEv(g){let v=0;for(const row of g.board())for(const p of row)if(p)v+=(p.color==='b'?1:-1)*CV[p.type];return v}
+function cgS(g,d,al,be,mx){if(g.in_checkmate())return mx?-99999-d:99999+d;if(g.game_over())return 0;if(d===0)return cgEv(g);
+ const ms=g.moves({verbose:true}).sort((a,b)=>(b.captured?1:0)-(a.captured?1:0));let best=mx?-1e9:1e9;
+ for(const m of ms){g.move(m);const v=cgS(g,d-1,al,be,!mx);g.undo();
+  if(mx){if(v>best)best=v;al=Math.max(al,v)}else{if(v<best)best=v;be=Math.min(be,v)}if(be<=al)break}return best}
+function cgAI(){if(cgd)return;const ms=cg.moves({verbose:true}),d=[1,2,3][dif];let best=-1e9,pick=null;
+ for(const m of ms){cg.move(m);const v=cgS(cg,d-1,-1e9,1e9,false)+NZ(30);cg.undo();if(v>best){best=v;pick=m}}
+ cg.move(pick);cgAfter()}
+function qPuz(){const rnd=n=>Math.random()*n|0;let best=0,base=0,bw=null;
+ for(let k=0;k<150;k++){H=Array(64).fill(0);V=Array(64).fill(0);P=[{r:5+rnd(4),c:rnd(9),w:1},{r:3+rnd(3),c:rnd(9),w:0}];
+  if(P[0].r===P[1].r&&P[0].c===P[1].c)continue;
+  for(let q=0;q<25;q++){const h=rnd(2),r=rnd(8),c=rnd(8);if(Math.random()<.4&&wallOk(h,r,c))(h?H:V)[r*8+c]=1}
+  base=dist(P[1].r,P[1].c,8);best=0;
+  for(const h of [1,0])for(let r=0;r<8;r++)for(let c=0;c<8;c++){if(!wallOk(h,r,c))continue;const A=h?H:V;A[r*8+c]=1;const d=dist(P[1].r,P[1].c,8)-base;A[r*8+c]=0;if(d>best){best=d;bw={h,r,c}}}
+  if(best>=3||(k>100&&best>=2))break}
+ qBW=bw;qHn=0;qBest=best;qBase=base;qt=0;qdone=false;$('#qmsg').textContent='Place ONE wall to make the pink pawn walk as far as possible to the bottom row.';qRender()}
+function oPuz(){for(let t=0;t<200;t++){oNew();let s=Os,p=0,ok=false;
+  for(let k=0;k<80;k++){const ms=oGen(s,p);if(!ms.length)break;
+   if(p===0&&k>=6&&ms.some(m=>oWins(oApply(s,m,0),m,0))){ok=true;break}
+   const sf=ms.filter(m=>!oWins(oApply(s,m,p),m,p));if(!sf.length)break;
+   s=oApply(s,sf[Math.random()*sf.length|0],p);p=1-p}
+  if(ok){Os=s;break}}
+ Ot=0;osl=-1;opc=-1;ODone=false;oHn=0;$('#omsg').textContent='Find the move that wins right now.';oRender()}
+function aSolve(b,ks){for(const a of aGen(b,0,ks)){const n=aApp(b,a);if(aWinner(n)===0)return a.c;if(ks>a.c){const r=aSolve(n,ks-a.c);if(r)return a.c+r}}return 0}
+function aPuz(){const rnd=n=>Math.random()*n|0,T=Date.now();let b;
+ do{b=Array(64).fill(0);const put=(v,r0,r1)=>{for(let q=0;q<30;q++){const i=(r0+rnd(r1-r0+1))*8+rnd(8);if(!b[i]&&!aTr.includes(i)){b[i]=v;return}}};
+  const ri=(2+rnd(2))*8+rnd(8);if(aTr.includes(ri)||aTr.includes(ri-8))continue;
+  b[ri]=1;b[ri-8]=10+rnd(5);put(5+rnd(2),3,7);put(1,3,7);put(2+rnd(3),4,7);put(9,0,1);put(11+rnd(4),0,4);put(9,0,3)
+ }while(!(aWinner(b)<0&&!aSolve(b,2)&&aSolve(b,4))&&Date.now()-T<2500);
+ aB=b;aT=0;aKs=4;aSel=-1;aPush=null;aPull=null;aDone=false;aHist=[];$('#amsg').textContent='Get one of your rabbits (R) to the top row this turn, in 4 steps.';aRender()}
+function sPuz(){const rnd=n=>Math.random()*n|0,T=Date.now();let b,h,ms=[];
+ do{b=Array(81).fill(0);h=[Array(9).fill(0),Array(9).fill(0)];ms=[];
+  const put=(v,r0,r1,c0,c1)=>{for(let q=0;q<30;q++){const i=(r0+rnd(r1-r0+1))*9+c0+rnd(c1-c0+1);if(!b[i]){b[i]=v;return}}};
+  const kc=3+rnd(3),kr=rnd(2),a0=Math.max(0,kc-3),a1=Math.min(8,kc+3);put(24,kr,kr,kc,kc);put(8,6,8,0,8);
+  for(let q=1+rnd(3);q>0;q--)put(16|[1,2,4,5][rnd(4)],0,2,Math.max(0,kc-2),Math.min(8,kc+2));
+  for(let q=2+rnd(2);q>0;q--)put([4,5,6,7][rnd(4)],1,4,a0,a1);
+  h[0][[3,4,5,6,7][rnd(5)]]++;if(rnd(2))h[0][[4,5][rnd(2)]]++;
+  if(sChk(b,1)||sChk(b,0))continue;
+  ms=sLegal(b,h,0).filter(m=>{const n=sApp(b,h,m,0);return sChk(n.b,1)&&!sAny(n.b,n.h,1)})
+ }while(!(ms.length&&ms.length<=3)&&Date.now()-T<1800);
+ sB=b;sH=h;sT=0;sDone=false;sSel=-1;sDrop=0;sPend=null;sLast=-1;sLM=sLegal(b,h,0);$('#smsg').textContent='Find the checkmate in 1. Drops count.';sRender()}
+$('#qn').onclick=()=>qPz?qPuz():qNew();$('#onw').onclick=()=>oPz?oPuz():oNew();$('#anw').onclick=()=>aPz?aPuz():aNew();$('#snw').onclick=()=>sPz?sPuz():sNew();$('#cgn').onclick=cgNew;
+let qBW=null,qHn=0,oHn=0;
+$('#qhint').onclick=()=>{if(!qPz||qdone||!qBW)return;const w=qBW,o=w.h?'horizontal':'vertical';qHn++;
+ if(qHn===1)$('#qmsg').textContent='Try a '+o+' wall.';
+ else{qh=!!w.h;$('#qo').textContent=qh?'Horizontal':'Vertical';$('#qmsg').textContent='Set to '+o+'. Tap the square at row '+(w.r+1)+', column '+(w.c+1)+' (counting from the top left).'}};
+$('#ohint').onclick=()=>{if(!oPz||ODone)return;const m=oGen(Os,0).find(x=>oWins(oApply(Os,x,0),x,0));if(!m)return;oHn++;
+ osl=m.slot;opc=oHn>1?m.from:-1;$('#omsg').textContent=oHn>1?'Move the highlighted piece with the selected card.':'Use the selected card.';oRender()};
+$('#ahint').onclick=()=>{if(!aPz||aDone||aT!==0)return;let a=null;
+ for(const x of aGen(aB,0,aKs)){const n=aApp(aB,x);if(aWinner(n)===0||(aKs>x.c&&aSolve(n,aKs-x.c))){a=x;break}}
+ if(!a){$('#amsg').textContent='No win from here. Use Undo step.';return}
+ aSel=a.i;aPush=null;aPull=null;$('#amsg').textContent='Start with the highlighted piece ('+(a.t===0?'a plain step':a.t===1?'a push':'a pull')+').';aRender()};
+$('#shint').onclick=()=>{if(!sPz||sDone||sT!==0)return;const m=sLM.find(x=>{const n=sApp(sB,sH,x,0);return sChk(n.b,1)&&!sAny(n.b,n.h,1)});
+ if(!m){$('#smsg').textContent='No mate found here.';return}
+ if(m.f<0){sDrop=-m.f;sSel=-1;$('#smsg').textContent='Try dropping the highlighted piece from your hand.'}else{sSel=m.f;sDrop=0;$('#smsg').textContent='Move the highlighted piece.'}
+ sPend=null;sRender()};
+$('#khint').onclick=()=>{if(done)return;let best=-1,bc=99,bl=[];
+ for(const i of order){if(user[i])continue;const l=[];
+  for(let d=1;d<=9;d++){let ok=true;for(const id of [hid[i],vid[i]]){const r=runs[id],must=r.cells.map(j=>user[j]).filter(Boolean);if(must.includes(d)||!combos(r.cells.length,r.sum,must.concat(d)).length){ok=false;break}}if(ok)l.push(d)}
+  if(l.length<bc){bc=l.length;best=i;bl=l}}
+ if(best<0)return;sel=best;render();
+ $('#msg').textContent=bc===0?'No digit fits the highlighted square, so check your earlier entries.':bc===1?'Only one digit fits the highlighted square.':'Fewest options here: '+bl.join(', ')};
+</script></body></html>
