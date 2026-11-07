@@ -61,12 +61,33 @@ button.on{border-color:var(--b);color:var(--b)}
 .sp.s0{color:var(--b);border-color:var(--b)}.sp.s1{color:var(--r);border-color:var(--r);transform:rotate(180deg)}.sp.pm{background:#3b1a2a}
 .shand{color:var(--m);font-size:.9rem;margin:2px 0;min-height:1.8em}.hp{margin:0 4px;padding:3px 8px;border-radius:6px;color:var(--t)}
 .q.tgt{background:#1f4a45}.mm{margin-bottom:6px}
+.hg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:min(96vw,420px);margin:12px 0}
+.tile{padding:20px 8px;font-size:1.05rem;line-height:1.5}.tile small{color:var(--m)}
+#clk{color:var(--m);font-size:.9rem;align-self:center}
+.q{position:relative}.q.lm{box-shadow:inset 0 0 0 2px #fbbf2499}
+.bd{position:absolute;top:1px;right:1px;font-size:10px;font-style:normal;line-height:1;padding:2px 4px;border-radius:9px;color:#000;font-weight:700}
+#cgl{max-width:420px;font-size:.85rem;line-height:1.9;margin:6px 0;min-height:1.5em}
+.mvv{cursor:pointer;padding:1px 3px;border-radius:4px}.mvv.cur{background:#223a68}
+input{font:inherit;color:var(--t);background:var(--card);border:1px solid #243049;border-radius:8px;padding:7px 8px;width:80px}
 #cgb{display:grid;grid-template-columns:repeat(8,1fr);width:min(96vw,420px);border-radius:8px;overflow:hidden;border:3px solid var(--b);margin:8px 0 12px}
 </style></head><body>
 <h1>Puzzle Grind</h1>
-<div class="bar"><button id="tk" class="on">Kakuro</button><button id="tc">Chess</button><button id="tq">Quoridor</button><button id="to">Onitama</button><button id="ta">Arimaa</button><button id="ts">Shogi</button></div>
+<div id="home" class="hg">
+<button class="tile" data-t="kk"><b>Kakuro</b><br><small>Endless number puzzles</small></button>
+<button class="tile" data-t="ch"><b>Chess</b><br><small>Play the AI, or mate puzzles</small></button>
+<button class="tile" data-t="qu"><b>Quoridor</b><br><small>Race and wall puzzles</small></button>
+<button class="tile" data-t="on"><b>Onitama</b><br><small>Cards decide your moves</small></button>
+<button class="tile" data-t="ar"><b>Arimaa</b><br><small>Push, pull, 4 steps a turn</small></button>
+<button class="tile" data-t="sh"><b>Shogi</b><br><small>Drops and promotion</small></button>
+</div>
+<div id="top" hidden style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px">
+<div class="bar" style="margin:0"><button id="mnu">Menu</button><b id="gt" style="align-self:center"></b><button id="bgb">Background</button><button id="bgr">Reset bg</button></div>
+<div class="bar" id="clkb" style="margin:0"><span style="color:var(--m);align-self:center">Timer:</span><button data-p="0" class="on">Off</button><button data-p="1">Blitz 3+2</button><button data-p="2">Rapid 10+5</button><button data-p="3">Long 30</button><span id="clk"></span></div>
+<input type="file" id="bgf" accept="image/*" hidden>
+</div>
+<div class="bar" id="tabs" hidden><button id="tk" class="on">Kakuro</button><button id="tc">Chess</button><button id="tq">Quoridor</button><button id="to">Onitama</button><button id="ta">Arimaa</button><button id="ts">Shogi</button></div>
 <div class="bar" id="dfb" hidden><span style="color:var(--m);align-self:center">AI level:</span><button data-d="0">Easy</button><button data-d="1" class="on">Medium</button><button data-d="2">Hard</button></div>
-<div id="kk">
+<div id="kk" hidden>
 <div class="bar" id="lv">
 <button data-l="easy">Easy 4×4</button><button data-l="med" class="on">Medium 6×6</button><button data-l="hard">Hard 8×8</button>
 </div>
@@ -81,7 +102,15 @@ button.on{border-color:var(--b);color:var(--b)}
 </div>
 <div id="chess" hidden>
 <div class="bar mm" data-g="c"><button class="on">Play</button><button>Puzzle</button></div>
-<div id="cgm" style="display:flex;flex-direction:column;align-items:center"><div id="cgmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div><div id="cgb"></div><div class="bar"><button id="cgn">New game</button></div><div style="max-width:420px;color:var(--m);font-size:.88rem">You are White. Pawns promote to a queen.</div></div>
+<div id="cgm" style="display:flex;flex-direction:column;align-items:center"><div class="bar" id="cgmode"><button data-m="ai" class="on">Vs AI</button><button data-m="fr">Vs friend</button></div>
+<div class="bar" id="cgtm"><span style="color:var(--m);align-self:center">Timer:</span><button data-p="0" class="on">Off</button><button data-p="1">Blitz 3+2</button><button data-p="2">Rapid 10+5</button><button data-p="3">Long 30</button><span id="cgclk" style="color:var(--m);align-self:center"></span></div>
+<div class="bar" id="cgfr" hidden><input id="olc" placeholder="Code" maxlength="5"><button id="olj">Join</button><button id="olh">Create online game</button><button id="olres">Resign</button></div>
+<div id="olst" hidden style="color:var(--m);font-size:.9rem;text-align:center"></div>
+<div id="cgmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div><div id="cgb"></div><div class="bar"><button id="cgn">New game</button><button id="cgrv">Review</button></div>
+<div class="bar" id="cgrp"><button data-r="0">⏮</button><button data-r="-1">◀</button><button data-r="1">▶</button><button data-r="9">⏭</button></div>
+<div id="cgl"></div>
+
+<div style="max-width:420px;color:var(--m);font-size:.88rem">You are White. Pawns promote to a queen.</div></div>
 <div id="cpz" hidden style="flex-direction:column;align-items:center">
 <div id="cinfo">Mate in 1 · solved <span id="cn">0</span></div>
 <div id="cmsg" style="min-height:1.4em;font-weight:600;text-align:center"></div>
@@ -219,7 +248,7 @@ document.addEventListener('keydown',e=>{if(e.key>='1'&&e.key<='9')input(+e.key);
   while(j>0&&j<S*S&&!cell[j])j+=dl;if(j>0&&j<S*S&&cell[j]){sel=j;render();e.preventDefault()}}});
 start();
 let ch=null,cs=null,cdone=false,cflip=false;
-function tab(t){const m={kk:'#kk',ch:'#chess',qu:'#quor',on:'#onit',ar:'#arim',sh:'#shog'},b={kk:'#tk',ch:'#tc',qu:'#tq',on:'#to',ar:'#ta',sh:'#ts'};for(const k in m){$(m[k]).hidden=k!==t;$(b[k]).classList.toggle('on',k===t)}if(t==='ch'&&!cg)cgNew();$('#dfb').hidden=t==='kk';if(t==='qu'&&!P)qNew();if(t==='on'&&!Os)oNew();if(t==='ar'&&!aB)aNew();if(t==='sh'&&!sB)sNew()}
+function tab(t){const m={kk:'#kk',ch:'#chess',qu:'#quor',on:'#onit',ar:'#arim',sh:'#shog'},b={kk:'#tk',ch:'#tc',qu:'#tq',on:'#to',ar:'#ta',sh:'#ts'};for(const k in m){$(m[k]).hidden=k!==t;$(b[k]).classList.toggle('on',k===t)}if(t==='ch'&&!cg)cgNew();$('#dfb').hidden=t==='kk';$('#home').hidden=true;$('#top').hidden=false;$('#gt').textContent=NAMES[t];$('#clkb').hidden=t==='kk'||t==='ch';curG=t;applyBg();clockReset();if(t==='qu'&&!P)qNew();if(t==='on'&&!Os)oNew();if(t==='ar'&&!aB)aNew();if(t==='sh'&&!sB)sNew()}
 function chNew(){
  if(typeof Chess==='undefined'){$('#cmsg').textContent='The chess library did not load. Check your connection.';return}
  let g,k=0;
@@ -548,4 +577,111 @@ $('#khint').onclick=()=>{if(done)return;let best=-1,bc=99,bl=[];
   if(l.length<bc){bc=l.length;best=i;bl=l}}
  if(best<0)return;sel=best;render();
  $('#msg').textContent=bc===0?'No digit fits the highlighted square, so check your earlier entries.':bc===1?'Only one digit fits the highlighted square.':'Fewest options here: '+bl.join(', ')};
+const NAMES={kk:'Kakuro',ch:'Chess',qu:'Quoridor',on:'Onitama',ar:'Arimaa',sh:'Shogi'},SEC={kk:'#kk',ch:'#chess',qu:'#quor',on:'#onit',ar:'#arim',sh:'#shog'},bgMem={};let curG=null;
+function showHome(){for(const k in SEC)$(SEC[k]).hidden=true;$('#home').hidden=false;$('#top').hidden=true;$('#dfb').hidden=true;curG=null}
+$('#mnu').onclick=showHome;
+document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+function applyBg(){const el=$(SEC[curG]);let u=bgMem[curG]||'';if(!u)try{u=localStorage.getItem('bg_'+curG)||''}catch(e){}
+ el.style.backgroundImage=u?'linear-gradient(rgba(3,7,18,.6),rgba(3,7,18,.6)),url("'+u+'")':'';
+ el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.borderRadius='14px';el.style.padding=u?'12px 6px':'';el.style.width=u?'min(98vw,540px)':''}
+$('#bgb').onclick=()=>$('#bgf').click();
+$('#bgf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const im=new Image(),fr=new FileReader();
+ im.onload=()=>{const s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);const u=c.toDataURL('image/jpeg',.72);bgMem[curG]=u;try{localStorage.setItem('bg_'+curG,u)}catch(x){}applyBg()};
+ fr.onload=()=>{im.src=fr.result};fr.readAsDataURL(f)};
+$('#bgr').onclick=()=>{delete bgMem[curG];try{localStorage.removeItem('bg_'+curG)}catch(e){}applyBg()};
+const CP=[[0,0],[180,2],[600,5],[1800,0]];let ck={p:0,t:[0,0],turn:0,over:false,last:Date.now()};
+const fm=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function clockShow(){$('#clk').textContent=ck.p?'You '+fm(ck.t[0])+' | AI '+fm(ck.t[1]):''}
+function clockReset(){ck.t=[CP[ck.p][0],CP[ck.p][0]];ck.turn=0;ck.over=false;ck.last=Date.now();clockShow()}
+function gSt(){if(curG==='ch')return cg?{t:cg.turn()==='w'?0:1,d:cgd}:null;if(curG==='qu')return P?{t:qt,d:qdone}:null;
+ if(curG==='on')return Os?{t:Ot,d:ODone}:null;if(curG==='ar')return aB?{t:aT,d:aDone}:null;return sB?{t:sT===1?1:0,d:sDone}:null}
+function isPz(){return curG==='ch'?!$('#cpz').hidden:!!({qu:qPz,on:oPz,ar:aPz,sh:sPz})[curG]}
+function timeout(s){const m=s===0?'You ran out of time. The AI wins.':'The AI ran out of time. You win!';
+ if(curG==='ch'){cgd=true;$('#cgmsg').textContent=m}else if(curG==='qu'){qdone=true;$('#qmsg').textContent=m}else if(curG==='on'){ODone=true;$('#omsg').textContent=m}
+ else if(curG==='ar'){aDone=true;$('#amsg').textContent=m}else{sDone=true;sT=2;$('#smsg').textContent=m}}
+setInterval(()=>{const now=Date.now(),dt=(now-ck.last)/1000;ck.last=now;if(!ck.p||!curG||curG==='kk'||ck.over||isPz())return;
+ const st=gSt();if(!st||st.d)return;
+ if(st.t!==ck.turn){ck.t[ck.turn]+=CP[ck.p][1];ck.turn=st.t}
+ ck.t[st.t]-=dt;if(ck.t[st.t]<=0){ck.t[st.t]=0;ck.over=true;timeout(st.t)}clockShow()},250);
+document.querySelectorAll('#clkb button').forEach(b=>b.onclick=()=>{ck.p=+b.dataset.p;document.querySelectorAll('#clkb button').forEach(x=>x.classList.toggle('on',x===b));clockReset()});
+['#cgn','#qn','#onw','#anw','#snw'].forEach(s=>$(s).addEventListener('click',clockReset));
+document.querySelectorAll('.mm button').forEach(b=>b.addEventListener('click',clockReset));
+let ol=null,cgVi=null,cgq={},cgH=[];
+const MQ={brilliant:['!!','#1baca6'],great:['!','#5c8bb0'],best:['★','#96bc4b'],excellent:['👍','#96bc4b'],good:['✓','#a88865'],book:['📖','#a88865'],inaccuracy:['?!','#f7c631'],mistake:['?','#e58f2a'],miss:['✗','#ca3431'],blunder:['??','#ca3431']};
+const cgHist=()=>cg.history({verbose:true});
+function cgNew(){if(typeof Chess==='undefined'){$('#cgmsg').textContent='The chess library did not load.';return}
+ if(ol)olLeave();cg=new Chess();cgs=null;cgd=false;cgVi=null;cgq={};$('#cgmsg').textContent='Your move (White).';cgR()}
+function cgR(){const hs=cgHist(),n=hs.length,rp=cgVi!==null&&cgVi<n,kk=rp?cgVi:n;let g=cg;
+ if(rp){g=new Chess();hs.slice(0,kk).forEach(m=>g.move(m))}
+ const b=g.board(),tg=new Set(),fl=ol&&ol.side==='b',lm=kk?hs[kk-1]:null,q=MQ[cgq[kk]];let h='';
+ if(!rp&&cgs)cg.moves({square:cgs,verbose:true}).forEach(m=>tg.add(m.to));
+ for(let i=0;i<64;i++){let r=i>>3,f=i&7;if(fl){r=7-r;f=7-f}const sq='abcdefgh'[f]+(8-r),p=b[r][f];
+  h+='<div class="q'+((r+f)%2?'':' l')+(sq===cgs&&!rp?' s':'')+(tg.has(sq)?' tgt':'')+(lm&&(lm.to===sq||lm.from===sq)?' lm':'')+(p?' p'+p.color:'')+'" data-s="'+sq+'">'+(p?'♚♛♜♝♞♟'['kqrbnp'.indexOf(p.type)]+'\uFE0E':'')+(q&&lm&&lm.to===sq?'<em class="bd" style="background:'+q[1]+'">'+q[0]+'</em>':'')+'</div>'}
+ $('#cgb').innerHTML=h;
+ $('#cgl').innerHTML=hs.map((m,i)=>(i%2?'':(i/2+1)+'. ')+'<span class="mvv'+(i+1===kk?' cur':'')+'" data-k="'+(i+1)+'">'+m.san+(cgq[i+1]?'<sup style="color:'+MQ[cgq[i+1]][1]+'">'+MQ[cgq[i+1]][0]+'</sup>':'')+'</span> ').join('')+'<div style="margin-top:6px;color:var(--m)">'+Object.keys(MQ).map(k=>'<span style="color:'+MQ[k][1]+'">'+MQ[k][0]+' '+k+'</span>').join(' · ')+'</div>'}
+function cgAfter(){cgVi=null;cgR();const me=ol?ol.side:'w',op=ol?'Your friend':'The AI';
+ if(cg.game_over()){cgd=true;$('#cgmsg').textContent=cg.in_checkmate()?(cg.turn()===me?'Checkmate. '+op+' wins.':'Checkmate. You win!'):'Draw.';return}
+ $('#cgmsg').textContent=cg.turn()===me?(cg.in_check()?'Check! Your move.':'Your move.'):(ol?'Waiting for your friend...':'AI is thinking...');
+ if(cg.turn()!==me&&!ol)setTimeout(cgAI,300)}
+$('#cgn').onclick=()=>cgNew();
+$('#cgb').onclick=e=>{const s=e.target.dataset.s,me=ol?ol.side:'w';
+ if(!s||!cg||cgd||cg.turn()!==me||(cgm==='fr'&&!(ol&&ol.ready))||(cgVi!==null&&cgVi<cg.history().length))return;const p=cg.get(s);
+ if(cgs&&cg.moves({square:cgs,verbose:true}).some(x=>x.to===s)){const mv={from:cgs,to:s,promotion:'q'};cg.move(mv);cgs=null;if(ol)ol.r.emit('cmove',mv);cgAfter();return}
+ cgs=p&&p.color===me?s:null;cgR()};
+function rpGo(k){const n=cg.history().length;cgVi=Math.max(0,Math.min(n,k));if(cgVi===n)cgVi=null;cgR()}
+$('#cgrp').onclick=e=>{const b=e.target.closest('button');if(!b||!cg)return;const n=cg.history().length,cur=cgVi===null?n:cgVi,d=+b.dataset.r;rpGo(d===0?0:d===9?n:cur+d)};
+$('#cgl').onclick=e=>{const k=e.target.closest('[data-k]');if(k&&cg)rpGo(+k.dataset.k)};
+const cgV=g=>{let v=0;for(const row of g.board())for(const p of row)if(p)v+=(p.color==='w'?1:-1)*CV[p.type];return v};
+function qs(g,a,b,d){if(g.in_checkmate())return -9e4;const s=(g.turn()==='w'?1:-1)*cgV(g);if(s>=b||d<=0)return s;if(s>a)a=s;
+ for(const m of g.moves({verbose:true})){if(!m.captured)continue;g.move(m);const v=-qs(g,-b,-a,d-1);g.undo();if(v>=b)return v;if(v>a)a=v}return a}
+function ns(g,d,a,b){if(g.game_over())return g.in_checkmate()?-9e4-d:0;if(d===0)return qs(g,a,b,3);
+ for(const m of g.moves({verbose:true}).sort((x,y)=>!!y.captured-!!x.captured)){g.move(m);const v=-ns(g,d-1,-b,-a);g.undo();if(v>=b)return v;if(v>a)a=v}return a}
+function rvPly(k){const g=new Chess(),pm=cgH[k-1];for(let i=0;i<k-1;i++)g.move(cgH[i]);let best=-1e9,sec=-1e9,pl=-1e9;
+ for(const m of g.moves({verbose:true})){g.move(m);const s=-ns(g,1,-1e6,1e6);g.undo();if(s>best){sec=best;best=s}else if(s>sec)sec=s;
+  if(m.from===pm.from&&m.to===pm.to&&(m.promotion||'')===(pm.promotion||''))pl=s}
+ const loss=best-pl;let c;g.move(pm);
+ const sac=CV[pm.piece]>=300&&g.moves({verbose:true}).some(o=>o.to===pm.to&&o.captured&&CV[o.piece]<CV[pm.piece]);
+ if(k<=6&&loss<=30)c='book';else if(loss<=10&&sac&&best>=-100&&best<800)c='brilliant';
+ else if(loss<=10&&best-sec>=150&&best<500&&sec>-1e8)c='great';
+ else c=loss<=10?'best':loss<=30?'excellent':loss<=70?'good':loss<=150?'inaccuracy':loss<=300?'mistake':'blunder';
+ const pv=cgq[k-1];if((pv==='mistake'||pv==='blunder')&&loss>=70&&c!=='blunder')c='miss';return c}
+$('#cgrv').onclick=()=>{if(!cg||!cg.history().length)return;cgH=cgHist();cgq={};let k=1;const n=cgH.length;
+ const step=()=>{if(k>n){$('#cgmsg').textContent='Review done. Tap a move or use the arrows.';rpGo(0);return}
+  $('#cgmsg').textContent='Reviewing '+k+'/'+n+'...';cgq[k]=rvPly(k);k++;setTimeout(step,0)};step()};
+function olLeave(){if(ol){try{ol.r.leave()}catch(e){}ol=null}$('#olst').textContent=''}
+async function olStart(host,code){if(ol)olLeave();let room=null;try{room=await claude.use('room')}catch(e){}
+ if(!room){$('#olst').textContent='Online play is not available in this view.';return}
+ let r;try{r=await room.join('ch-'+code)}catch(e){$('#olst').textContent='Could not open that room.';return}
+ cg=new Chess();cgs=null;cgd=false;cgVi=null;cgq={};ol={r,side:host?'w':'b',ready:false};clockReset();
+ r.on('cmove',m=>{const d=m.data;if(m.sameTab||!ol||cgd||!ol.ready||!d)return;try{if(cg.turn()!==ol.side&&cg.move({from:d.from,to:d.to,promotion:'q'}))cgAfter()}catch(e){}});
+ r.on('chello',m=>{if(m.sameTab||!host||!ol)return;ol.ready=true;r.emit('ccfg',{p:ck.p});clockReset();$('#olst').textContent='Your friend joined. You are White.';$('#cgmsg').textContent='Your move (White).'});
+ r.on('ccfg',m=>{if(m.sameTab||host||!ol)return;ol.ready=true;ck.p=Math.min(3,Math.max(0,(m.data&&m.data.p)|0));
+  setP(ck.p);$('#olst').textContent='Connected. You are Black.';$('#cgmsg').textContent='Waiting for White to move...'});
+ r.on('cres',m=>{if(m.sameTab||cgd)return;cgd=true;$('#cgmsg').textContent='Your friend resigned. You win!'});
+ r.on('crem',m=>{if(m.sameTab||!ol)return;cgNew()});
+ r.onPeers(c=>{if(c&&c.left&&c.left.length&&ol&&!cgd)$('#olst').textContent='Your friend left the room.'});
+ $('#olst').textContent=host?'Your code: '+code+'. Share it, then wait for your friend.':'Joining '+code+'...';
+ $('#cgmsg').textContent=host?'Waiting for a friend to join...':'Joining...';cgR();if(!host)r.emit('chello',{})}
+$('#olh').onclick=()=>olStart(true,Math.random().toString(36).slice(2,7));
+$('#olj').onclick=()=>{const c=$('#olc').value.trim().toLowerCase();if(/^[a-z0-9]{3,5}$/.test(c))olStart(false,c)};
+$('#olres').onclick=()=>{if(ol&&!cgd){cgd=true;ol.r.emit('cres',{});$('#cgmsg').textContent='You resigned.'}};
+let cgm='ai';
+function setP(p){ck.p=p;document.querySelectorAll('#clkb button,#cgtm button').forEach(x=>x.classList.toggle('on',+x.dataset.p===p));clockReset()}
+document.querySelectorAll('#clkb button,#cgtm button').forEach(b=>b.onclick=()=>setP(+b.dataset.p));
+function clockShow(){const s=ck.p?'You '+fm(ck.t[0])+' | '+(curG==='ch'&&cgm==='fr'?'Friend':'AI')+' '+fm(ck.t[1]):'';$('#clk').textContent=s;$('#cgclk').textContent=s}
+function clockReset(){ck.t=[CP[ck.p][0],CP[ck.p][0]];let s=null;try{s=curG?gSt():null}catch(e){}ck.turn=s?s.t:0;ck.over=false;ck.last=Date.now();clockShow()}
+function cgNew(){if(typeof Chess==='undefined'){$('#cgmsg').textContent='The chess library did not load.';return}
+ cg=new Chess();cgs=null;cgd=false;cgVi=null;cgq={};clockReset();
+ $('#cgmsg').textContent=cgm==='ai'?'Your move (White).':(ol&&ol.ready?(ol.side==='w'?'Your move (White).':'Waiting for White to move...'):'Create a game, or join with a code.');cgR()}
+function cgMode(m){cgm=m;if(ol)olLeave();document.querySelectorAll('#cgmode button').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
+ $('#cgfr').hidden=m!=='fr';$('#olst').hidden=m!=='fr';cgNew()}
+document.querySelectorAll('#cgmode button').forEach(b=>b.onclick=()=>cgMode(b.dataset.m));
+$('#cgn').onclick=()=>{if(cgm==='fr'&&ol&&ol.ready)ol.r.emit('crem',{});cgNew()};
+function gSt(){if(curG==='ch')return cg&&(cgm==='ai'||(ol&&ol.ready))?{t:cg.turn()===(ol?ol.side:'w')?0:1,d:cgd}:null;if(curG==='qu')return P?{t:qt,d:qdone}:null;
+ if(curG==='on')return Os?{t:Ot,d:ODone}:null;if(curG==='ar')return aB?{t:aT,d:aDone}:null;return sB?{t:sT===1?1:0,d:sDone}:null}
+function clockShow(){$('#clk').textContent=ck.p?'You '+fm(ck.t[0])+' | '+(curG==='ch'&&ol?'Friend':'AI')+' '+fm(ck.t[1]):''}
+function timeout(s){const o=curG==='ch'&&ol?'Your friend':'The AI',m=s===0?'You ran out of time. '+o+' wins.':o+' ran out of time. You win!';
+ if(curG==='ch'){cgd=true;$('#cgmsg').textContent=m}else if(curG==='qu'){qdone=true;$('#qmsg').textContent=m}else if(curG==='on'){ODone=true;$('#omsg').textContent=m}
+ else if(curG==='ar'){aDone=true;$('#amsg').textContent=m}else{sDone=true;sT=2;$('#smsg').textContent=m}}
 </script></body></html>
